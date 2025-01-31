@@ -68,7 +68,10 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'ride_sharing_project.wsgi.application'
-
+#AUTH  URLS
+LOGIN_REDIRECT_URL = 'rides:list'
+LOGOUT_REDIRECT_URL = 'auth:login'
+LOGIN_URL = 'auth:login'
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
