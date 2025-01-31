@@ -49,5 +49,14 @@ erss-hwk1-ar791-zl303
                 ├── driver_views.py
                 └── ride_views.py
 ```
-
+### Authentication Flow
+![Authentication Flow](./auth_flow.png)
+### Driver Registration Flow
+!![driver registeration Flow](./driver_registration_flow.png)
+### request and book rides Flow
+!![Authentication Flow](./request_book_rides_flow.png)
+### share  rides Flow
+!![Authentication Flow](./share_ride_flow.png)
+### Driver Operation Flow
+!![Authentication Flow](./driver_operation_flow.png)
 ## Project Overview
