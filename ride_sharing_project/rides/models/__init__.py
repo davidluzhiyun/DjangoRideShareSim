@@ -1,14 +1,6 @@
-from django.contrib.auth.models import AbstractUser
-from django.db import models
+from .user import User
+from .vehicle import Vehicle
+from .ride import Ride, RideStatus
+from .ride_sharer import RideSharer
 
-class User(AbstractUser):
-    email = models.EmailField(unique=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        db_table = 'auth_user'
-        indexes = [
-            models.Index(fields=['email']),
-            models.Index(fields=['username']),
-        ]
+__all__ = ['User', 'Vehicle', 'Ride', 'RideStatus', 'RideSharer']

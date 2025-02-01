@@ -1,9 +1,11 @@
-from ride_sharing_project.rides import models
+from django.db import models
+from django.contrib.auth import get_user_model
 
+User = get_user_model()
 
 class Vehicle(models.Model):
     driver = models.OneToOneField(
-        models.User,
+        User,
         on_delete=models.CASCADE,
         related_name='vehicle',
         help_text='User who drives this vehicle'
@@ -26,6 +28,9 @@ class Vehicle(models.Model):
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        app_label = 'rides'
 
     def can_accommodate_ride(self, ride):
         "Check if vehicle can accommodate the ride"

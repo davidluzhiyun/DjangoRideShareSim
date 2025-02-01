@@ -4,7 +4,7 @@ from django.contrib import messages
 from django.db import transaction
 from ..forms.driver_forms import DriverRegistrationForm
 from ..models.ride import Ride, RideStatus
-from ..models.driver import Vehicle
+from ..models.vehicle import Vehicle
 from ..services.ride_service import RideService
 from ..forms.ride_forms import DriverSearchForm
 

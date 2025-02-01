@@ -1,7 +1,9 @@
+from django.db import models
+from django.contrib.auth import get_user_model
 from django.forms import ValidationError
-from ride_sharing_project.rides import models
-from ride_sharing_project.rides.models.ride import Ride, RideStatus
+from .ride import Ride, RideStatus
 
+User = get_user_model()
 
 class RideSharer(models.Model):
     ride = models.ForeignKey(
@@ -29,11 +31,12 @@ class RideSharer(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
+        app_label = 'rides'
         unique_together = ['ride', 'user']
         indexes = [
             models.Index(fields=['earliest_arrival', 'latest_arrival']),
         ]
-# adding validation error msg for earliest arrival time, latest arrival time, ride status, and ride arrival time
+
     def clean(self):
         if self.earliest_arrival > self.latest_arrival:
             raise ValidationError("Earliest arrival must be before latest arrival")

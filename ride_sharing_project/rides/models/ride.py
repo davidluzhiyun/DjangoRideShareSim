@@ -1,3 +1,5 @@
+# rides/models/ride.py
+
 from django.db import models
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
@@ -32,7 +34,7 @@ class Ride(models.Model):
     )
     owner_party_size = models.PositiveIntegerField(
         help_text='Number of passengers in owner\'s party'
-    )    
+    )
     vehicle_type = models.CharField(
         max_length=50,
         blank=True,
@@ -64,6 +66,7 @@ class Ride(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
+        app_label = 'rides'
         indexes = [
             models.Index(fields=['status', 'arrival_time']),
             models.Index(fields=['owner', 'status']),
@@ -73,7 +76,7 @@ class Ride(models.Model):
     def clean(self):
         if self.arrival_time <= timezone.now():
             raise ValidationError("Arrival time must be in the future")
-    
+
     def save(self, *args, **kwargs):
         self.full_clean()
         super().save(*args, **kwargs)

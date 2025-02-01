@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-$*61ug_zix&-tyl@*o&*vv-f7lt$=5&u4v7u^i)bts2k0qsv=)
 DEBUG = True
 
 ALLOWED_HOSTS = []
-
+AUTH_USER_MODEL = 'rides.User'
 
 # Application definition
 
@@ -37,7 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-]
+    'rides.apps.RidesConfig',
+    ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

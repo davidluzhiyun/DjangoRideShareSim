@@ -1,5 +1,5 @@
 from django import forms
-from rides.models.driver import Vehicle
+from rides.models.vehicle import Vehicle
 
 class DriverRegistrationForm(forms.ModelForm):
     class Meta:
