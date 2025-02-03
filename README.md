@@ -65,6 +65,30 @@ erss-hwk1-ar791-zl303
     │           └── ride_views.py
     └── share_ride_flow.png
 ```
+```
+- /accounts/login/
+- /accounts/logout/ 
+- /accounts/register/
+
+- /driver/register/
+- /driver/profile/
+- /driver/search/
+- /driver/rides/
+- /driver/ride/<ride_id>/accept/
+- /driver/ride/<ride_id>/complete/
+
+- /rides/ (list view)
+- /rides/request/
+- /rides/<ride_id>/ (detail view)
+- /rides/<ride_id>/edit/
+- /rides/search/
+- /rides/<ride_id>/join/
+- /rides/my-rides/
+
+- /admin/
+
+- / (homepage/root URL)
+```
 ### Authentication Flow
 ![Authentication Flow](./auth_flow.png)
 ### Driver Registration Flow
