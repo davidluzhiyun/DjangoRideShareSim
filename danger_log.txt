@@ -1,0 +1,18 @@
+Authentication
+1. Users might attempt to register with the same info
+2. Conection lost while creating new user or hitting back button
+3. Potential attacks at stealing accout info or brute force break-in attempt
+4. Wanting to retrieve forgotten account
+5. Auto login attempt with wrong info due to error
+
+Driver Registration Flow
+1. Similar problem as 1 and 2 from Authentication
+2. Submit invalid vehicle info
+
+Request and Book Rides
+1. Ride closed between drive found and joining Ride
+2. Ride edited after Driver accepts and before the acceptance info is uploaded to server
+
+Driver Operation Flow
+1. Race condition in ride acceptance
+2. Ride edited at selection
