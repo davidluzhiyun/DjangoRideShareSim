@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'widget_tweaks',
     'rides.apps.RidesConfig',
     ]
 
@@ -70,10 +71,9 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'ride_sharing_project.wsgi.application'
 #AUTH  URLS
-LOGIN_REDIRECT_URL = 'rides:list'
-LOGOUT_REDIRECT_URL = 'auth:login'
-LOGIN_URL = 'auth:login'
-
+LOGIN_REDIRECT_URL = 'main:list'  # Update from rides:list
+LOGOUT_REDIRECT_URL = 'accounts:login'
+LOGIN_URL = 'accounts:login'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 DATABASES = {
