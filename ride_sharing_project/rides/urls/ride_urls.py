@@ -4,7 +4,7 @@ from rides.views import ride_views
 app_name = 'rides'
 
 urlpatterns = [
-    path('', ride_views.ride_list, name='list'),
+    path('profile/', ride_views.ride_list, name='list'),
     path('request/', ride_views.request_ride, name='request'),
     path('<int:ride_id>/', ride_views.ride_detail, name='detail'),
     path('<int:ride_id>/edit/', ride_views.edit_ride, name='edit'),
