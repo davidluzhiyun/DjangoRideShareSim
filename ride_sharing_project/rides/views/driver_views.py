@@ -128,3 +128,33 @@ def complete_ride(request, ride_id):
         messages.error(request, str(e))
     #redirect to the driver rides page
     return redirect('driver:my_rides')
+
+@login_required
+def search_rides(request):
+    if not hasattr(request.user, 'vehicle'):
+        messages.warning(request, 'You need to register as a driver first.')
+        return redirect('driver:register')
+    
+    form = DriverSearchForm(request.GET)
+    rides = []
+    
+    if form.is_valid():
+        rides = Ride.objects.filter(
+            status=RideStatus.OPEN
+        ).select_related('owner')
+        
+        vehicle = request.user.vehicle
+        rides = [
+            ride for ride in rides
+            if vehicle.can_accommodate_ride(ride) and  # Changed from can_accommodate to can_accommodate_ride
+            (not ride.vehicle_type or 
+             ride.vehicle_type.lower() == vehicle.vehicle_type.lower())
+        ]
+    
+    context = {
+        'form': form,
+        'rides': rides,
+        'search_performed': bool(request.GET)
+    }
+    
+    return render(request, 'rides/driver/search.html', context)
