@@ -116,20 +116,33 @@ def join_ride(request, ride_id):
     
     if request.method == 'POST':
         form = RideSharerForm(request.POST)
+        
+        # Set ride and user before validation
+        sharer = form.instance
+        sharer.ride = ride
+        sharer.user = request.user
+        
         if form.is_valid():
             try:
-                ride_service = RideService()
-                ride_service.join_ride(
-                    ride=ride,
-                    user=request.user,
-                    data=form.cleaned_data
-                )
-                messages.success(request, 'Successfully joined the ride!')
-                return redirect('rides:detail', ride_id=ride.id)
-            except ValueError as e:
+                # Validate form data
+                if sharer.party_size <= 0:
+                    messages.error(request, "Party size must be greater than 0")
+                elif sharer.earliest_arrival > sharer.latest_arrival:
+                    messages.error(request, "Earliest arrival must be before latest arrival")
+                elif ride.arrival_time < sharer.earliest_arrival or \
+                     ride.arrival_time > sharer.latest_arrival:
+                    messages.error(request, "Ride arrival time is outside acceptable window")
+                else:
+                    sharer.save()
+                    messages.success(request, 'Successfully joined the ride!')
+                    return redirect('rides:detail', ride_id=ride.id)
+            except ValidationError as e:
                 messages.error(request, str(e))
     else:
-        form = RideSharerForm()
+        form = RideSharerForm(initial={
+            'earliest_arrival': ride.arrival_time,
+            'latest_arrival': ride.arrival_time
+        })
     
     return render(request, 'rides/ride/join.html', {
         'form': form,

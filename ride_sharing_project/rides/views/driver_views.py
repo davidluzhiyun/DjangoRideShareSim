@@ -100,33 +100,51 @@ def accept_ride(request, ride_id):
     
     ride = get_object_or_404(Ride, id=ride_id, status=RideStatus.OPEN)
     vehicle = request.user.vehicle
-    #confirm the ride and show msg
+
     try:
+        # Pre-validate capacity
+        if ride.total_passengers > vehicle.max_passengers:
+            messages.error(request, f"Your vehicle cannot accommodate {ride.total_passengers} passengers (max: {vehicle.max_passengers})")
+            return redirect('driver:search_rides')
+
+        # Pre-validate vehicle type if specified
+        if ride.vehicle_type and ride.vehicle_type.lower() != vehicle.vehicle_type.lower():
+            messages.error(request, "Your vehicle type doesn't match the requirements")
+            return redirect('driver:search_rides')
+            
         ride_service = RideService()
         ride_service.confirm_ride(ride, vehicle)
         messages.success(request, 'Ride accepted successfully!')
-    except ValueError as e:
+    except ValidationError as e:
         messages.error(request, str(e))
-    #redirect to the rides page for driver
+    except Exception as e:
+        messages.error(request, "An error occurred while accepting the ride")
+    
     return redirect('driver:my_rides')
 #completing a ride
 @login_required
+@transaction.atomic
 def complete_ride(request, ride_id):
-    ride = get_object_or_404(
-        Ride,
-        id=ride_id,
-        driver=request.user.vehicle,
-        status=RideStatus.CONFIRMED
-    )
-    #complete the ride and display the message
+    if not hasattr(request.user, 'vehicle'):
+        messages.warning(request, 'You need to register as driver first.')
+        return redirect('driver:register')
+
     try:
-        ride_service = RideService()
-        ride_service.complete_ride(ride)
-        messages.success(request, 'Ride completed!')
-    #display err msg if any error occurs
-    except ValueError as e:
+        ride = get_object_or_404(
+            Ride, 
+            id=ride_id,
+            driver=request.user.vehicle,
+            status=RideStatus.CONFIRMED
+        )
+
+        ride.status = RideStatus.COMPLETE
+        ride.save()
+        messages.success(request, 'Ride marked as complete!')
+    except Ride.DoesNotExist:
+        messages.error(request, 'Ride not found or cannot be completed')
+    except Exception as e:
         messages.error(request, str(e))
-    #redirect to the driver rides page
+    
     return redirect('driver:my_rides')
 
 @login_required
