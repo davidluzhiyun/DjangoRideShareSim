@@ -18,6 +18,11 @@
                     {% if field.help_text %}
                         <small class="form-text text-muted">{{ field.help_text }}</small>
                     {% endif %}
+                    {% if field.errors %}
+                        <div class="text-danger">
+                            {{ field.errors|join:", " }}
+                        </div>
+                    {% endif %}
                 </div>
             {% endfor %}
             <button type="submit" class="btn btn-primary">Search</button>
@@ -25,40 +30,42 @@
     </div>
 </div>
 
-{% if rides %}
-    <div class="card">
-        <div class="card-header">
-            <h5 class="mb-0">Available Rides</h5>
-        </div>
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>Destination</th>
-                            <th>Arrival Time</th>
-                            <th>Available Seats</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for ride in rides %}
+{% if search_performed %}
+    {% if rides %}
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Available Rides</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
                             <tr>
-                                <td>{{ ride.destination }}</td>
-                                <td>{{ ride.arrival_time }}</td>
-                                <td>{{ ride.available_seats }}</td>
-                                <td>
-                                    <a href="{% url 'rides:join' ride.id %}" 
-                                       class="btn btn-sm btn-success">Join Ride</a>
-                                </td>
+                                <th>Destination</th>
+                                <th>Arrival Time</th>
+                                <th>Total Passengers</th>
+                                <th>Actions</th>
                             </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            {% for ride in rides %}
+                                <tr>
+                                    <td>{{ ride.destination }}</td>
+                                    <td>{{ ride.arrival_time }}</td>
+                                    <td>{{ ride.total_passengers }}</td>
+                                    <td>
+                                        <a href="{% url 'rides:join' ride.id %}" 
+                                           class="btn btn-sm btn-success">Join Ride</a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
-    </div>
-{% elif search_performed %}
-    <div class="alert alert-info">No rides found matching your criteria.</div>
+    {% else %}
+        <div class="alert alert-info">No rides found matching your criteria.</div>
+    {% endif %}
 {% endif %}
 {% endblock %}

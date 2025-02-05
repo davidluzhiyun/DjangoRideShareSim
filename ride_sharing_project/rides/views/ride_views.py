@@ -76,10 +76,11 @@ def edit_ride(request, ride_id):
     
     return render(request, 'rides/ride/edit.html', {'form': form, 'ride': ride})
 #search for rides that are available by matching the vehicle and the ride request
-@login_required
+@login_required 
 def search_sharable_rides(request):
     form = RideSearchForm(request.GET)
     rides = []
+    search_performed = bool(request.GET)
     
     if form.is_valid():
         earliest = form.cleaned_data['earliest_arrival']
@@ -89,23 +90,25 @@ def search_sharable_rides(request):
         
         rides = Ride.objects.filter(
             status=RideStatus.OPEN,
-            shareable=True
+            shareable=True,
+            arrival_time__gte=earliest,
+            arrival_time__lte=latest
         ).exclude(owner=request.user)
         
         if destination:
             rides = rides.filter(destination__icontains=destination)
-        
+            
+        # Filter rides that can accommodate the party size
         rides = [
-            ride for ride in rides
-            if earliest <= ride.arrival_time <= latest and
-            not ride.is_full and
-            (ride.driver is None or
-             ride.driver.can_accommodate(ride.total_passengers + party_size))
+            ride for ride in rides 
+            if not ride.driver or 
+            ride.driver.can_accommodate_ride(ride.total_passengers + party_size)
         ]
-    
+
     context = {
         'form': form,
-        'rides': rides
+        'rides': rides,
+        'search_performed': search_performed
     }
     return render(request, 'rides/ride/search.html', context)
 #join a ride that is shareable
