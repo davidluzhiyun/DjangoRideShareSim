@@ -8,6 +8,8 @@ Authentication
 Driver Registration Flow
 1. Similar problem as 1 and 2 from Authentication
 2. Submit invalid vehicle info
+3. No enforcement of content of destination and requests
+4. User might create rides that are in the past
 
 Request and Book Rides
 1. Ride closed between drive found and joining Ride
