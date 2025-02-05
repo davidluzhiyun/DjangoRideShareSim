@@ -2,54 +2,41 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db import transaction
-from ..forms.driver_forms import DriverRegistrationForm
+from ..forms.driver_forms import DriverRegistrationForm as VehicleForm  # Changed import
 from ..models.ride import Ride, RideStatus
-from ..models.vehicle import Vehicle
+from ..models.vehicle import Vehicle 
 from ..services.ride_service import RideService
 from ..forms.ride_forms import DriverSearchForm
 
 #register user as a driver , login is required by the user to register as a driver
 @login_required
+def driver_profile(request):
+    vehicle = getattr(request.user, 'vehicle', None)
+    if not vehicle:
+        return redirect('driver:register')
+        
+    form = VehicleForm(instance=vehicle)
+    return render(request, 'rides/driver/profile.html', {'form': form, 'vehicle': vehicle})
+
+@login_required
 def driver_register(request):
     if hasattr(request.user, 'vehicle'):
-        messages.warning(request, 'You are already registered as a driver.')
-        return redirect('driver:profile')
+        vehicle = request.user.vehicle
+    else:
+        vehicle = None
+        
     if request.method == 'POST':
-        form = DriverRegistrationForm(request.POST)
+        form = VehicleForm(request.POST, instance=vehicle)
         if form.is_valid():
             vehicle = form.save(commit=False)
             vehicle.driver = request.user
             vehicle.save()
-            messages.success(request, 'Successfully registered as a driver!')
+            messages.success(request, 'Vehicle information updated successfully!')
             return redirect('driver:profile')
     else:
-        form = DriverRegistrationForm()
-    
+        form = VehicleForm(instance=vehicle)
+        
     return render(request, 'rides/driver/register.html', {'form': form})
-
-#display the driver profile and give option to edit profile details 
-@login_required
-def driver_profile(request):
-    if not hasattr(request.user, 'vehicle'):
-        messages.warning(request, 'You need to register as a driver first.')
-        return redirect('driver:register')
-    
-    if request.method == 'POST':
-        form = DriverRegistrationForm(request.POST, instance=request.user.vehicle)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Profile updated successfully!')
-            return redirect('driver:profile')
-    else:
-        form = DriverRegistrationForm(instance=request.user.vehicle)
-    
-    context = {
-        'form': form,
-        'active_rides': request.user.vehicle.driven_rides.exclude(
-            status=RideStatus.COMPLETE
-        )
-    }
-    return render(request, 'rides/driver/profile.html', context)
 #search for rides that are available by matching the vehicle 
 @login_required
 def search_rides(request):

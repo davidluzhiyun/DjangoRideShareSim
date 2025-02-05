@@ -11,4 +11,6 @@ urlpatterns = [
     path('search/', ride_views.search_sharable_rides, name='search'),
     path('<int:ride_id>/join/', ride_views.join_ride, name='join'),
     path('my-rides/', ride_views.my_rides, name='my_rides'),
+        path('search/', ride_views.search_sharable_rides, name='search'),
+
 ]

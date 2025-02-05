@@ -1,26 +1,35 @@
 {% extends 'rides/base.html' %}
 
-{% block title %}Driver Profile{% endblock title %}
+{% block title %}Driver Profile{% endblock %}
 
 {% block content %}
 <div class="container mt-4">
     <div class="card">
         <div class="card-header d-flex justify-content-between align-items-center">
             <h4 class="mb-0">Vehicle Information</h4>
-            <a href="{% url 'driver:register' %}" class="btn btn-primary">Update Vehicle Info</a>
         </div>
         <div class="card-body">
-            <div class="row">
-                <div class="col-md-6">
-                    <p><strong>Vehicle Type:</strong> {{ vehicle.vehicle_type }}</p>
-                    <p><strong>License Plate:</strong> {{ vehicle.license_plate }}</p>
-                    <p><strong>Maximum Passengers:</strong> {{ vehicle.max_passengers }}</p>
-                    {% if vehicle.special_info %}
-                        <p><strong>Special Info:</strong> {{ vehicle.special_info }}</p>
-                    {% endif %}
-                </div>
-            </div>
+            <form method="post" action="{% url 'driver:register' %}">
+                {% csrf_token %}
+                {% for field in form %}
+                    <div class="mb-3">
+                        <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                        <div class="form-control-wrapper">
+                            {{ field }}
+                        </div>
+                        {% if field.help_text %}
+                            <small class="form-text text-muted">{{ field.help_text }}</small>
+                        {% endif %}
+                        {% if field.errors %}
+                            <div class="text-danger">
+                                {{ field.errors|join:", " }}
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+                <button type="submit" class="btn btn-primary">Update Vehicle Info</button>
+            </form>
         </div>
     </div>
 </div>
-{% endblock content %}
+{% endblock %}
