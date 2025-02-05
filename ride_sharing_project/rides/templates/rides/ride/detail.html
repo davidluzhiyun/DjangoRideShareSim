@@ -17,11 +17,7 @@
                     <h5>Basic Information</h5>
                     <p><strong>Destination:</strong> {{ ride.destination }}</p>
                     <p><strong>Arrival Time:</strong> {{ ride.arrival_time }}</p>
-                    <p><strong>Status:</strong> 
-                        <span class="badge bg-{{ ride.status|lower }}">
-                            {{ ride.get_status_display }}
-                        </span>
-                    </p>
+                    <p><strong>Status:</strong> {{ ride.get_status_display }}</p>
                     <p><strong>Total Passengers:</strong> {{ ride.total_passengers }}</p>
                     {% if ride.vehicle_type %}
                         <p><strong>Requested Vehicle:</strong> {{ ride.vehicle_type }}</p>
