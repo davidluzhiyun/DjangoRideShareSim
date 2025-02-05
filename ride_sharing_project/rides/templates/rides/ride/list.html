@@ -64,11 +64,7 @@
                                     <tr>
                                         <td>{{ share.ride.destination }}</td>
                                         <td>{{ share.ride.arrival_time }}</td>
-                                        <td>
-                                            <span class="badge bg-{{ share.ride.status|lower }}">
-                                                {{ share.ride.get_status_display }}
-                                            </span>
-                                        </td>
+                                        <td class = "text-primary">{{ share.ride.get_status_display }}</td>
                                         <td>
                                             <a href="{% url 'rides:detail' share.ride.id %}" 
                                                class="btn btn-sm btn-info">View</a>
