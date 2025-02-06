@@ -92,23 +92,25 @@ def accept_ride(request, ride_id):
     try:
         # Pre-validate capacity
         if ride.total_passengers > vehicle.max_passengers:
-            messages.error(request, f"Your vehicle cannot accommodate {ride.total_passengers} passengers (max: {vehicle.max_passengers})")
+            messages.error(request, f"Your vehicle cannot accommodate {ride.total_passengers} passengers")
             return redirect('driver:search_rides')
 
         # Pre-validate vehicle type if specified
         if ride.vehicle_type and ride.vehicle_type.lower() != vehicle.vehicle_type.lower():
-            messages.error(request, "Your vehicle type doesn't match the requirements")
+            messages.error(request, "Vehicle type doesn't match requirements")
             return redirect('driver:search_rides')
-            
-        ride_service = RideService()
-        ride_service.confirm_ride(ride, vehicle)
+
+        # Simple confirmation without email
+        ride.driver = vehicle
+        ride.status = RideStatus.CONFIRMED  
+        ride.save()
+        
         messages.success(request, 'Ride accepted successfully!')
-    except ValidationError as e:
-        messages.error(request, str(e))
+        return redirect('driver:my_rides')
+
     except Exception as e:
-        messages.error(request, "An error occurred while accepting the ride")
-    
-    return redirect('driver:my_rides')
+        messages.error(request, str(e))
+        return redirect('driver:search_rides')
 #completing a ride
 @login_required
 @transaction.atomic
