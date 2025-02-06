@@ -16,13 +16,15 @@ class RideRequestForm(forms.ModelForm):
         ]
         widgets = {
             'arrival_time': forms.DateTimeInput(
-                attrs={'type': 'datetime-local'},
+                attrs={'type': 'datetime-local', 'required': True},
                 format='%Y-%m-%dT%H:%M'
             )
         }
     
     def clean_arrival_time(self):
         arrival_time = self.cleaned_data.get('arrival_time')
+        if not arrival_time:
+            raise forms.ValidationError("Arrival time is required")
         if arrival_time <= timezone.now():
             raise forms.ValidationError("Arrival time must be in the future")
         return arrival_time
@@ -73,7 +75,6 @@ class RideSharerForm(forms.ModelForm):
         cleaned_data = super().clean()
         earliest = cleaned_data.get('earliest_arrival')
         latest = cleaned_data.get('latest_arrival')
-        
         if earliest and latest:
             if earliest >= latest:
                 raise forms.ValidationError(
