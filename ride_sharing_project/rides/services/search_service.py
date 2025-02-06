@@ -1,6 +1,10 @@
 # rides/services/search_service.py
+from urllib import request
 from django.db.models import Q
+from django.shortcuts import render
 from django.utils import timezone
+
+from ride_sharing_project.rides.forms.ride_forms import RideSearchForm
 from ..models.ride import Ride, RideStatus
 
 class SearchService:
@@ -9,36 +13,38 @@ class SearchService:
     """
     
     def search_sharable_rides(self, filters):
-        """
-        Search for sharable rides based on destination and arrival window
-        """
-        rides = Ride.objects.filter(
+        form = RideSearchForm(request.GET)
+        rides = []
+        search_performed = bool(request.GET)
+    
+        if form.is_valid():
+            earliest = form.cleaned_data['earliest_arrival']
+            latest = form.cleaned_data['latest_arrival']
+            party_size = form.cleaned_data['party_size']
+            destination = form.cleaned_data.get('destination', '')
+            
+            rides = Ride.objects.filter(
             status=RideStatus.OPEN,
-            shareable=True
-        )
+            shareable=True,
+            arrival_time__gte=earliest,
+            arrival_time__lte=latest
+        ).exclude(owner=request.user)
+        
+        if destination:
+            rides = rides.filter(destination__icontains=destination)
+            
+        # Filter rides that can accommodate the party size:
+        rides = [
+            ride for ride in rides 
+            if not ride.driver or (ride.total_passengers + party_size) <= ride.driver.max_passengers
+        ]
 
-        # Filter by destination if provided
-        if filters.get('destination'):
-            rides = rides.filter(
-                destination__icontains=filters['destination']
-            )
-
-        # Filter by arrival window
-        if filters.get('earliest_arrival') and filters.get('latest_arrival'):
-            rides = rides.filter(
-                arrival_time__gte=filters['earliest_arrival'],
-                arrival_time__lte=filters['latest_arrival']
-            )
-
-        # Exclude rides that would exceed capacity with new passengers
-        if filters.get('party_size'):
-            rides = [
-                ride for ride in rides
-                if not ride.driver or  # No driver assigned yet
-                ride.total_passengers + filters['party_size'] <= ride.driver.max_passengers
-            ]
-
-        return rides
+        context = {
+        'form': form,
+        'rides': rides,
+        'search_performed': search_performed
+        }
+        return render(request, 'rides/ride/search.html', context)
 
     def search_available_rides_for_driver(self, vehicle):
         """

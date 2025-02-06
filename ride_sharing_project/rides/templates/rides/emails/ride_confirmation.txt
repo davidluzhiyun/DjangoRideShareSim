@@ -1,0 +1,15 @@
+Hello {{ user.username }},
+
+Your ride to {{ ride.destination }} has been confirmed.
+
+Ride Details:
+- Destination: {{ ride.destination }}
+- Arrival Time: {{ ride.arrival_time }}
+- Total Passengers: {{ ride.total_passengers }}
+
+Driver Information:
+- Driver: {{ ride.driver.driver.username }}
+- Vehicle Type: {{ ride.driver.vehicle_type }}
+- License Plate: {{ ride.driver.license_plate }}
+
+View Ride Details: {{ domain }}{% url 'rides:detail' ride.id %}

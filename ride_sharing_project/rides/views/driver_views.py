@@ -3,7 +3,9 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db import transaction
-from ..forms.driver_forms import DriverRegistrationForm as VehicleForm  # Changed import
+
+from ..services.email_service import EmailService
+from ..forms.driver_forms import DriverRegistrationForm as VehicleForm
 from ..models.ride import Ride, RideStatus
 from ..models.vehicle import Vehicle 
 from ..services.ride_service import RideService
@@ -100,10 +102,16 @@ def accept_ride(request, ride_id):
             messages.error(request, "Vehicle type doesn't match requirements")
             return redirect('driver:search_rides')
 
-        # Simple confirmation without email
+        # Confirm ride
         ride.driver = vehicle
         ride.status = RideStatus.CONFIRMED  
         ride.save()
+
+        # Send confirmation emails
+        email_service = EmailService()
+        email_service.send_ride_confirmation(ride.owner, ride)
+        for sharer in ride.sharers.all():
+            email_service.send_ride_confirmation(sharer.user, ride)
         
         messages.success(request, 'Ride accepted successfully!')
         return redirect('driver:my_rides')
