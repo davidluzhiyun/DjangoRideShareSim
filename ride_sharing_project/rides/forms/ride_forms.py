@@ -62,12 +62,15 @@ class RideSharerForm(forms.ModelForm):
         fields = ['party_size', 'earliest_arrival', 'latest_arrival']
         widgets = {
             'earliest_arrival': forms.DateTimeInput(
-                attrs={'type': 'datetime-local'},
+                attrs={'type': 'datetime-local', 'required': True},
                 format='%Y-%m-%dT%H:%M'
             ),
             'latest_arrival': forms.DateTimeInput(
-                attrs={'type': 'datetime-local'},
+                attrs={'type': 'datetime-local', 'required': True}, 
                 format='%Y-%m-%dT%H:%M'
+            ),
+            'party_size': forms.NumberInput(
+                attrs={'min': '1', 'required': True}
             )
         }
 
@@ -75,15 +78,21 @@ class RideSharerForm(forms.ModelForm):
         cleaned_data = super().clean()
         earliest = cleaned_data.get('earliest_arrival')
         latest = cleaned_data.get('latest_arrival')
+        party_size = cleaned_data.get('party_size')
+
+        # Validate required fields
+        if not earliest:
+            self.add_error('earliest_arrival', 'This field is required')
+        if not latest:
+            self.add_error('latest_arrival', 'This field is required') 
+        if not party_size:
+            self.add_error('party_size', 'This field is required')
+
+        # Validate arrival window if both times present
         if earliest and latest:
             if earliest >= latest:
-                raise forms.ValidationError(
-                    "Earliest arrival must be before latest arrival"
-                )
-            if earliest <= timezone.now():
-                raise forms.ValidationError(
-                    "Earliest arrival must be in the future"
-                )
+                self.add_error('earliest_arrival', 'Must be before latest arrival')
+
         return cleaned_data
 
 class DriverSearchForm(forms.Form):

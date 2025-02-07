@@ -38,15 +38,27 @@ class RideSharer(models.Model):
         ]
 
     def clean(self):
+        # First validate arrival times exist
+        if not self.earliest_arrival or not self.latest_arrival:
+            raise ValidationError("Both earliest and latest arrival times are required")
+            
         if self.earliest_arrival > self.latest_arrival:
             raise ValidationError("Earliest arrival must be before latest arrival")
+        
+        # Skip ride validations if ride not yet set    
+        if not hasattr(self, 'ride'):
+            return
+            
+        # Validate ride-specific rules
         if not self.ride.shareable:
             raise ValidationError("This ride is not shareable")
+            
+        if self.ride.status != RideStatus.OPEN:
+            raise ValidationError("Can only join open rides")
+            
         if self.ride.arrival_time < self.earliest_arrival or \
            self.ride.arrival_time > self.latest_arrival:
             raise ValidationError("Ride arrival time is outside acceptable window")
-        if self.ride.status != RideStatus.OPEN:
-            raise ValidationError("Can only join open rides")
 
     def save(self, *args, **kwargs):
         self.full_clean()

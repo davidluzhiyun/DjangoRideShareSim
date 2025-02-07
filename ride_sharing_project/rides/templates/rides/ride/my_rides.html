@@ -53,17 +53,20 @@
                             <th>Destination</th>
                             <th>Arrival Time</th>
                             <th>Status</th>
+                            <th>Party Size</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {% for ride in shared_rides %}
+                        {% for sharer in shared_rides %}
                             <tr>
-                                <td>{{ ride.destination }}</td>
-                                <td>{{ ride.arrival_time }}</td>
-                                <td class="text-primary">{{ ride.get_status_display }}</td>
+                                <td>{{ sharer.ride.destination }}</td>
+                                <td>{{ sharer.ride.arrival_time }}</td>
+                                <td>{{ sharer.ride.get_status_display }}</td>
+                                <td>{{ sharer.party_size }}</td>
                                 <td>
-                                    <a href="{% url 'rides:detail' ride.id %}" class="btn btn-sm btn-info">View</a>
+                                    <a href="{% url 'rides:detail' sharer.ride.id %}" 
+                                       class="btn btn-sm btn-info">View</a>
                                 </td>
                             </tr>
                         {% endfor %}

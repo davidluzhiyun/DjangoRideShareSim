@@ -116,50 +116,54 @@ def search_sharable_rides(request):
 @login_required
 @transaction.atomic
 def join_ride(request, ride_id):
-    ride = get_object_or_404(Ride, id=ride_id, status=RideStatus.OPEN, shareable=True)
+    ride = get_object_or_404(Ride, id=ride_id)
     
     if request.method == 'POST':
         form = RideSharerForm(request.POST)
-        
-        # Set ride and user before validation
-        sharer = form.instance
-        sharer.ride = ride
-        sharer.user = request.user
-        
         if form.is_valid():
             try:
-                # Validate form data
-                if sharer.party_size <= 0:
-                    messages.error(request, "Party size must be greater than 0")
-                elif sharer.earliest_arrival > sharer.latest_arrival:
-                    messages.error(request, "Earliest arrival must be before latest arrival")
-                elif ride.arrival_time < sharer.earliest_arrival or \
-                     ride.arrival_time > sharer.latest_arrival:
-                    messages.error(request, "Ride arrival time is outside acceptable window")
-                else:
-                    sharer.save()
-                    messages.success(request, 'Successfully joined the ride!')
-                    return redirect('rides:detail', ride_id=ride.id)
+                sharer = form.save(commit=False)
+                sharer.user = request.user
+                sharer.ride = ride # Set ride before validation
+                
+                try:
+                    # Manually validate the model
+                    sharer.full_clean()
+                except ValidationError as e:
+                    form.add_error(None, e)
+                    raise
+                
+                sharer.save()
+                messages.success(request, 'Successfully joined the ride!')
+                return redirect('rides:detail', ride_id=ride.id)
+                
             except ValidationError as e:
                 messages.error(request, str(e))
     else:
         form = RideSharerForm(initial={
             'earliest_arrival': ride.arrival_time,
-            'latest_arrival': ride.arrival_time
+            'latest_arrival': ride.arrival_time,
+            'party_size': 1
         })
     
-    return render(request, 'rides/ride/join.html', {
-        'form': form,
-        'ride': ride
-    })
-#display all the rides for the logged in user 
+    return render(request, 'rides/ride/join.html', {'form': form, 'ride': ride})
 @login_required
 def my_rides(request):
-    context = {
-        'owned_rides': request.user.owned_rides.all().order_by('-created_at'),
-        'shared_rides': request.user.shared_rides.all().order_by('-created_at'),
-    }
+    # Get all rides where user is owner
+    owned_rides = request.user.owned_rides.all().order_by('-created_at')
+    
+    # Get all rides where user is sharer using RideSharer model
+    shared_rides = RideSharer.objects.filter(user=request.user).select_related('ride').order_by('-created_at')
+    
+    # Get driven rides if user is driver
+    driven_rides = []
     if hasattr(request.user, 'vehicle'):
-        context['driven_rides'] = request.user.vehicle.driven_rides.all().order_by('-created_at')
+        driven_rides = request.user.vehicle.driven_rides.all().order_by('-created_at')
+    
+    context = {
+        'owned_rides': owned_rides,
+        'shared_rides': shared_rides,
+        'driven_rides': driven_rides,
+    }
     
     return render(request, 'rides/ride/my_rides.html', context)
