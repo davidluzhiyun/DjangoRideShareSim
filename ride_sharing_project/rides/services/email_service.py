@@ -17,18 +17,34 @@ class EmailService:
     def gmail_authenticate(self):
         SCOPES = ['https://www.googleapis.com/auth/gmail.send']
         creds = None
-        if os.path.exists('token.json'):
-            creds = Credentials.from_authorized_user_file('token.json', SCOPES)
-        if not creds or not creds.valid:
-            if creds and creds.expired and creds.refresh_token:
-                creds.refresh(Request())
-            else:
-                flow = InstalledAppFlow.from_client_secrets_file(
-                    'credentials.json', SCOPES)
-                creds = flow.run_local_server(port=0)
+
+        try:
+            if os.path.exists('token.json'):
+                creds = Credentials.from_authorized_user_file('token.json', SCOPES)
+        
+            if not creds or not creds.valid:
+                if creds and creds.expired and creds.refresh_token:
+                    creds.refresh(Request())
+                else:
+                    flow = InstalledAppFlow.from_client_secrets_file(
+                    settings.GMAIL_API_CREDENTIALS, 
+                    SCOPES
+                )
+                # Use local redirect URI for testing
+                flow.redirect_uri = 'http://localhost:8080'
+                creds = flow.run_local_server(
+                    port=8080,
+                    access_type='offline',
+                    include_granted_scopes='true'
+                )
+            
             with open('token.json', 'w') as token:
                 token.write(creds.to_json())
-        return build('gmail', 'v1', credentials=creds)
+            
+            return build('gmail', 'v1', credentials=creds)
+        except Exception as e:
+            print(f"Gmail authentication failed: {str(e)}")
+        return None
     def send_ride_confirmation(self, user, ride):
         """Send ride confirmation email to a participant"""
         try:
