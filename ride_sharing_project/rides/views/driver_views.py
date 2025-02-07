@@ -78,8 +78,20 @@ def driver_rides(request):
         messages.warning(request, 'You need to register as a driver first.')
         return redirect('driver:register')
     
-    rides = request.user.vehicle.driven_rides.all().order_by('-created_at')
-    return render(request, 'rides/driver/rides.html', {'rides': rides})
+    confirmed_rides = request.user.vehicle.driven_rides.filter(
+        status=RideStatus.CONFIRMED
+    ).order_by('-created_at')
+    
+    completed_rides = request.user.vehicle.driven_rides.filter(
+        status=RideStatus.COMPLETE
+    ).order_by('-created_at')
+
+    context = {
+        'confirmed_rides': confirmed_rides,
+        'completed_rides': completed_rides
+    }
+    
+    return render(request, 'rides/driver/rides.html', context)
 #accept a ride request
 @login_required
 @transaction.atomic
