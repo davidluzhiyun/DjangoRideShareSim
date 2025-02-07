@@ -1,11 +1,12 @@
 from django.urls import path
-from rides.views import ride_views
+from rides.views import ride_views, profile_views
 from rides.views import index_views
 
 app_name = 'rides'
 
 urlpatterns = [
     path('', index_views.index_redirect, name='index'),
+    path('profile/', profile_views.profile_edit, name='profile'),
     path('profile/', ride_views.ride_list, name='list'),
     path('request/', ride_views.request_ride, name='request'),
     path('<int:ride_id>/', ride_views.ride_detail, name='detail'),
