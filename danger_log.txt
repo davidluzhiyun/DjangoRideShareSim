@@ -17,4 +17,4 @@ Request and Book Rides
 Driver Operation Flow
 1. Race condition in ride acceptance
 2. Ride edited at selection
-3. Driver changing their info after accepting ride 
+3. Driver changing their info after accepting ride
