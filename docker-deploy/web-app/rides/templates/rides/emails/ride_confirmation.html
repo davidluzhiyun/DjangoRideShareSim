@@ -1,0 +1,24 @@
+{% extends 'rides/emails/base_email.html' %}
+
+{% block content %}
+<h2>Ride Confirmation</h2>
+<p>Hello {{ user.username }},</p>
+
+<p>Your ride to {{ ride.destination }} has been confirmed.</p>
+
+<h3>Ride Details:</h3>
+<ul>
+    <li>Destination: {{ ride.destination }}</li>
+    <li>Arrival Time: {{ ride.arrival_time }}</li>
+    <li>Total Passengers: {{ ride.total_passengers }}</li>
+</ul>
+
+<h3>Driver Information:</h3>
+<ul>
+    <li>Driver: {{ ride.driver.driver.username }}</li>
+    <li>Vehicle Type: {{ ride.driver.vehicle_type }}</li>
+    <li>License Plate: {{ ride.driver.license_plate }}</li>
+</ul>
+
+<p><a href="{{ domain }}{% url 'rides:detail' ride.id %}">View Ride Details</a></p>
+{% endblock %}

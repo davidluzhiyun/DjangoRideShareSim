@@ -1,0 +1,61 @@
+{% extends 'rides/base.html' %}
+
+{% block title %}Ride Details{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h4 class="mb-0">Ride Details</h4>
+            {% if is_owner and ride.is_modifiable %}
+                <a href="{% url 'rides:edit' ride.id %}" class="btn btn-primary">Edit Ride</a>
+            {% endif %}
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>Basic Information</h5>
+                    <p><strong>Destination:</strong> {{ ride.destination }}</p>
+                    <p><strong>Arrival Time:</strong> {{ ride.arrival_time }}</p>
+                    <p><strong>Status:</strong> {{ ride.get_status_display }}</p>
+                    <p><strong>Total Passengers:</strong> {{ ride.total_passengers }}</p>
+                    {% if ride.vehicle_type %}
+                        <p><strong>Requested Vehicle:</strong> {{ ride.vehicle_type }}</p>
+                    {% endif %}
+                    {% if ride.special_requests %}
+                        <p><strong>Special Requests:</strong> {{ ride.special_requests }}</p>
+                    {% endif %}
+                </div>
+                
+                <div class="col-md-6">
+                    <h5>Participants</h5>
+                    <p><strong>Owner:</strong> {{ ride.owner.username }} ({{ ride.owner_party_size }} passengers)</p>
+                    
+                    {% if ride.sharers.exists %}
+                        <h6>Sharers:</h6>
+                        <ul>
+                        {% for sharer in ride.sharers.all %}
+                            <li>{{ sharer.user.username }} ({{ sharer.party_size }} passengers)</li>
+                        {% endfor %}
+                        </ul>
+                    {% endif %}
+
+                    {% if ride.driver %}
+                        <h6>Driver Information:</h6>
+                        <p><strong>Driver:</strong> {{ ride.driver.driver.username }}</p>
+                        <p><strong>Vehicle Type:</strong> {{ ride.driver.vehicle_type }}</p>
+                        <p><strong>License Plate:</strong> {{ ride.driver.license_plate }}</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            {% if is_driver and ride.status == 'CONFIRMED' %}
+                <div class="mt-4">
+                    <a href="{% url 'driver:complete_ride' ride.id %}" 
+                       class="btn btn-success">Mark as Complete</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,96 @@
+{% extends 'rides/base.html' %}
+
+{% block title %}My Rides - Driver{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h4 class="mb-0">My Rides as Driver</h4>
+        <a href="{% url 'driver:search_rides' %}" class="btn btn-primary">Find New Rides</a>
+    </div>
+    <div class="card-body">
+        <ul class="nav nav-tabs mb-3">
+            <li class="nav-item">
+                <a class="nav-link active" data-bs-toggle="tab" href="#confirmed">Confirmed Rides</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-bs-toggle="tab" href="#completed">Completed Rides</a>
+            </li>
+        </ul>
+
+        <div class="tab-content">
+            <!-- Confirmed Rides Tab -->
+            <div class="tab-pane fade show active" id="confirmed">
+                {% if confirmed_rides %}
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Destination</th>
+                                    <th>Arrival Time</th>
+                                    <th>Total Passengers</th>
+                                    <th>Owner</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for ride in confirmed_rides %}
+                                    <tr>
+                                        <td>{{ ride.destination }}</td>
+                                        <td>{{ ride.arrival_time }}</td>
+                                        <td>{{ ride.total_passengers }}</td>
+                                        <td>{{ ride.owner.username }}</td>
+                                        <td>
+                                            <a href="{% url 'rides:detail' ride.id %}" 
+                                               class="btn btn-sm btn-info">View</a>
+                                            <a href="{% url 'driver:complete_ride' ride.id %}" 
+                                               class="btn btn-sm btn-success">Complete</a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p class="text-muted">No confirmed rides at the moment.</p>
+                {% endif %}
+            </div>
+
+            <!-- Completed Rides Tab -->
+            <div class="tab-pane fade" id="completed">
+                {% if completed_rides %}
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Destination</th>
+                                    <th>Arrival Time</th>
+                                    <th>Total Passengers</th>
+                                    <th>Owner</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for ride in completed_rides %}
+                                    <tr>
+                                        <td>{{ ride.destination }}</td>
+                                        <td>{{ ride.arrival_time }}</td>
+                                        <td>{{ ride.total_passengers }}</td>
+                                        <td>{{ ride.owner.username }}</td>
+                                        <td>
+                                            <a href="{% url 'rides:detail' ride.id %}" 
+                                               class="btn btn-sm btn-info">View</a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p class="text-muted">No completed rides yet.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

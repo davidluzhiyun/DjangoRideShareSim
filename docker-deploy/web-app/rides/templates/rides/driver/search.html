@@ -1,0 +1,68 @@
+{% extends 'rides/base.html' %}
+
+{% block title %}Search Available Rides{% endblock %}
+
+{% block content %}
+<div class="card mb-4">
+    <div class="card-header">
+        <h4 class="mb-0">Search for Available Rides</h4>
+    </div>
+    <div class="card-body">
+        <form method="get">
+            {% for field in form %}
+                <div class="mb-3">
+                    <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                    <div class="form-control-wrapper">
+                        {{ field }}
+                    </div>
+                    {% if field.help_text %}
+                        <small class="form-text text-muted">{{ field.help_text }}</small>
+                    {% endif %}
+                </div>
+            {% endfor %}
+            <button type="submit" class="btn btn-primary">Search</button>
+        </form>
+    </div>
+</div>
+
+{% if rides %}
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0">Available Ride Requests</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Destination</th>
+                            <th>Arrival Time</th>
+                            <th>Total Passengers</th>
+                            <th>Vehicle Type</th>
+                            <th>Special Requests</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for ride in rides %}
+                            <tr>
+                                <td>{{ ride.destination }}</td>
+                                <td>{{ ride.arrival_time }}</td>
+                                <td>{{ ride.total_passengers }}</td>
+                                <td>{{ ride.vehicle_type|default:"Any" }}</td>
+                                <td>{{ ride.special_requests|default:"None" }}</td>
+                                <td>
+                                    <a href="{% url 'driver:accept_ride' ride.id %}" 
+                                       class="btn btn-sm btn-success">Accept Ride</a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% elif search_performed %}
+    <div class="alert alert-info">No rides found matching your criteria.</div>
+{% endif %}
+{% endblock %}
