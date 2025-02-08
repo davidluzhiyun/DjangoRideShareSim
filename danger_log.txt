@@ -1,20 +1,22 @@
 Authentication
 1. Users might attempt to register with the same info (We enforce different user names)
-2. Conection lost while creating new user or hitting back button (Hopefully handled by django)
+2. Conection lost while creating new user or hitting back button (handled by django through @atomic)
 3. Potential attacks at stealing accout info or brute force break-in attempt (Hopefully handled by django)
-4. Wanting to retrieve forgotten account
-5. Attempt to access pages without login in (handled by django)
+4. User wanting to retrieve forgotten account
+5. Attempt to access pages without login in (handled by django with decorators)
 
 Driver Registration Flow
 1. Submit invalid vehicle info
-2. Repeated registration of the same vehicle (we banned that based on license plate)
+2. Spamming through repeated registration of the same vehicle (we banned that based on license plate)
+3. User wanting to re-register the same vehicle with upgraded feature (not allowed for now)
 3. Access driver pages with url without registering as driver (We handled that. Users get redirected to driver register page)
 
 Request and Book Rides
-1. Ride closed between drive found and joining Ride
+1. Ride closed between drive found and joining Ride (handled by django through @atomic)
 2. Ride edited after Driver accepts and before the acceptance info is uploaded to server
+3. User might enter a arrival time in the past or try to access the website from different time zones
 
-Driver Operation Flow
-1. Race condition in ride acceptance
-2. Ride edited at selection
+Driver Operation Flow:
+1. Race condition in ride acceptance (handled by django through @atomic)
+2. Ride edited at selection (handled by django through @atomic)
 3. Driver changing their info after accepting ride
