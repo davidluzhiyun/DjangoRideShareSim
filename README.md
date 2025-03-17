@@ -1,6 +1,16 @@
 # ERSS-HWK1-AR791-ZL303
 
 ## Getting Started
+sudo apt-get install docker.io docker-compose
+Go to docker-deploy
+chmod o+x runserver.sh
+chmod o+x initserver.sh
+sudo docker-compose up
+(To nuke everything and restart
+sudo docker-compose down -v
+sudo docker image rm
+
+sudo docker system prune -a (FYI: this will remove all your docker images and containers))
 
 ### Directory Structure
 
